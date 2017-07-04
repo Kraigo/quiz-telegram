@@ -1,0 +1,39 @@
+const appRoot = require('app-root-path');
+const Question = require(appRoot + '/models/Question');
+const Quiz = require(appRoot + '/models/Quiz');
+
+module.exports = {
+    addQuestion(question, answer) {
+        var question = new Question({
+            title: question,
+            answer: answer
+        })
+
+        return question.save();
+    },
+    addQuiz(chatId, question) {
+        var quiz = new Quiz({
+            chatId: chatId,
+            question: question,
+            hint: question.answer.split('').map(a => '_').join(''),
+            hintAvailable: false
+        })
+        return quiz.save().then((doc) => 
+            Quiz.findOne(doc).populate('question').exec()
+        );
+    },
+    getQuiz(predicate) {
+        return Quiz.findOne(predicate).populate('question').exec();
+    },
+    getRandomQuestion() {
+        return new Promise((resolve, reject) => {
+            Question.random((err, question) => {
+                if (err) reject(err);
+                resolve(question);
+            })
+        })
+    },
+    getHint() {
+
+    }
+}

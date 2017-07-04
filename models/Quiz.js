@@ -2,20 +2,21 @@ const mongoose = require('mongoose');
 
 let schema = new mongoose.Schema({
     chatId: Number,
-    question: [{
+    question: {
         type: mongoose.Schema.ObjectId,
         ref: "Question"
-    }],
+    },
     hint: String,
     hintAvailable: String,
     start: Date,
     isEnded: Boolean,
-    winner: [{
+    winner: {
         type: mongoose.Schema.ObjectId,
         ref: "User"
-    }]
+    }
 });
 
-var Model = mongoose.model('Team', shema);
+
+var Model = mongoose.model('Quiz', schema);
 
 module.exports = Model;

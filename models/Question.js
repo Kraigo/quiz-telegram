@@ -5,6 +5,16 @@ let schema = new mongoose.Schema({
     answer: String
 });
 
-var Model = mongoose.model('Question', shema);
+schema.statics.random = function(callback) {
+  this.count(function(err, count) {
+    if (err) {
+      return callback(err);
+    }
+    var rand = Math.floor(Math.random() * count);
+    this.findOne().skip(rand).exec(callback);
+  }.bind(this));
+};
+
+var Model = mongoose.model('Question', schema);
 
 module.exports = Model;
