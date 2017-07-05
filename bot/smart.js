@@ -29,57 +29,73 @@ module.exports = function(bot) {
             });
         },
         sendQuiz(chatId, quiz) {
-            var message = speech.quiz(quiz);
+            let message = speech.quiz(quiz);
 
-            bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
+            return bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
                 .then(res => {
 
                     setTimeout(() => {
                         quiz.hintAvailable = true;
                         quiz.save().then(() => {
                             message += `\nДать подсказку /hint ?`;
-                            bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id});
+                            bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown"});
                         });
                     }, 5000);
                     
-                });
+                });            
+        },
+        sendEndQuiz(chatId, quiz) {
+            let message = speech.quizEnd(quiz);
+            return bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
+        },
 
-            
+        sendWinQuiz(chatId, msgId) {
+            let message = speech.quizWin();
+            return bot.sendMessage(chatId, message,
+                {
+                    parse_mode: "Markdown",
+                    reply_to_message_id: msgId
+                });
         },
 
 
         startHint(chatId) {
             memory.getQuiz({chatId}).then(quiz => {
+
                 if (quiz && quiz.hintAvailable) {
+                    let nextHint = this.getNextHint(quiz);
 
-                    // memory.updateQuiz(quiz, {
-                    //     hint: this.getNextHint(quiz),
-                    //     hintAvailable: false
-                    // }).then((doc) => {
-                    //     if (quiz.hint.split('').filter(a => a === '_').length > 0) {
-                    //         this.sentQuiz(chatId, quiz);
-                    //     }
-                    // })
+                    if (nextHint.indexOf('_') >= 0) {
+                        quiz.update({
+                            hint: nextHint,
+                            hintAvailable: false
+                        }, (err) => {
+                            memory.getQuiz({chatId}).then(quiz => {
+                                this.sendQuiz(chatId, quiz);
+                            })
 
-                    quiz.update({
-                        hint: this.getNextHint(quiz),
-                        hintAvailable: false
-                    }, (doc) => {
-                        memory.getQuiz({chatId}).then(quiz => {
-                            // if (quiz.hint.split('').filter(a => a === '_').length > 0) {
-                                this.sentQuiz(chatId, quiz);
-                            // }
-                        })
-                    });
+                        });
+                    } else {
+                        quiz.update({
+                            hintAvailable: false,
+                            isEnded: true,
+                            ended: new Date()
+                        }, (err) => {
 
-                } else {
+                            this.sendEndQuiz(chatId, quiz);
+
+                        });
+                    }
+
+                }
+                
+                if (!quiz) {
                     bot.sendMessage(chatId, speech.nohint());
                 }
             });
         },
-        sendHint(chatId, quiz) {
+        
 
-        },
         getNextHint(quiz) {
             let notHinted = quiz.question.answer.split('').filter((a, i) => quiz.hint[i] === '_');
             let nextHint;
@@ -91,6 +107,34 @@ module.exports = function(bot) {
                     .join('');
             }
             return quiz.hint;
+        },
+
+        checkQuiz(message) {
+            let chatId = message.chat.id;
+
+            memory.getQuiz({chatId}).then(quiz => {
+                if (quiz) {
+                    let quizAnswer = quiz.question.answer.trim().toLowerCase();
+                    let userAnswer = message.text.trim().toLowerCase();
+                    if (quizAnswer === userAnswer) {
+                        let score = quiz.hint.split('').filter(a => a === '_').length;
+
+                        if (quiz.question.answer.length === score) {
+                            score *= 1.5;
+                        }
+
+                        quiz.update({
+                            isEnded: true,
+                            ended: new Date()
+                        }, (err) => {
+
+                            this.sendWinQuiz(chatId, message.message_id);
+
+                        });                       
+
+                    }
+                }
+            })
         }
 
     }

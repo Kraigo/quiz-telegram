@@ -8,6 +8,8 @@ const memory = require('./memory');
 bot.on("message", msg => {
     let chatId = msg.chat.id;
 
+    smart.checkQuiz(msg);
+
     if (msg.text.includes('привет')) {
         smart.greating(msg);
     } else if (msg.text.includes('/quiz')) {

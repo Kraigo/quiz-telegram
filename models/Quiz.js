@@ -7,8 +7,9 @@ let schema = new mongoose.Schema({
         ref: "Question"
     },
     hint: String,
-    hintAvailable: String,
+    hintAvailable: Boolean,
     start: Date,
+    ended: Date,
     isEnded: Boolean,
     winner: {
         type: mongoose.Schema.ObjectId,
