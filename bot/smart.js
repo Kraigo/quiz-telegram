@@ -30,17 +30,19 @@ module.exports = function(bot) {
         },
         sendQuiz(chatId, quiz) {
             var message = speech.quiz(quiz);
-            bot.sendMessage(chatId, message, {parse_mode: "Markdown"}).then(res => {
 
-                setTimeout(() => {
-                    quiz.hintAvailable = true;
-                    quiz.save().then(() => {
-                        message += `\nДать подсказку /hint ?`;
-                        bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id});
-                    });
-                }, 5000);
-                
-            });
+            bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
+                .then(res => {
+
+                    setTimeout(() => {
+                        quiz.hintAvailable = true;
+                        quiz.save().then(() => {
+                            message += `\nДать подсказку /hint ?`;
+                            bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id});
+                        });
+                    }, 5000);
+                    
+                });
 
             
         },
@@ -49,14 +51,26 @@ module.exports = function(bot) {
         startHint(chatId) {
             memory.getQuiz({chatId}).then(quiz => {
                 if (quiz && quiz.hintAvailable) {
-                    quiz.hint = this.getNextHint(quiz);
-                    quiz.hintAvailable = false;
 
-                    quiz.save().then(() => {
-                        if (quiz.hint.split('').filter(a => a === '_').length > 0) {
-                            this.sentQuiz(chatId, quiz);
-                        }
-                    })
+                    // memory.updateQuiz(quiz, {
+                    //     hint: this.getNextHint(quiz),
+                    //     hintAvailable: false
+                    // }).then((doc) => {
+                    //     if (quiz.hint.split('').filter(a => a === '_').length > 0) {
+                    //         this.sentQuiz(chatId, quiz);
+                    //     }
+                    // })
+
+                    quiz.update({
+                        hint: this.getNextHint(quiz),
+                        hintAvailable: false
+                    }, (doc) => {
+                        memory.getQuiz({chatId}).then(quiz => {
+                            // if (quiz.hint.split('').filter(a => a === '_').length > 0) {
+                                this.sentQuiz(chatId, quiz);
+                            // }
+                        })
+                    });
 
                 } else {
                     bot.sendMessage(chatId, speech.nohint());

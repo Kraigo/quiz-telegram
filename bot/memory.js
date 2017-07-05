@@ -25,6 +25,9 @@ module.exports = {
     getQuiz(predicate) {
         return Quiz.findOne(predicate).populate('question').exec();
     },
+    updateQuiz(quiz, update) {
+        return Quiz.update(quiz, update).exec();
+    },
     getRandomQuestion() {
         return new Promise((resolve, reject) => {
             Question.random((err, question) => {
@@ -35,5 +38,5 @@ module.exports = {
     },
     getHint() {
 
-    }
+    },
 }
