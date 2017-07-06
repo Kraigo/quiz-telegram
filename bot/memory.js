@@ -30,8 +30,14 @@ module.exports = {
         }, predicate)
         return Quiz.findOne(predicate).populate('question').exec();
     },
+    getQuizzes(predicate) {
+        return Quiz.find(predicate).populate('question').exec();
+    },
     updateQuiz(quiz, update) {
         return Quiz.update(quiz, update).exec();
+    },
+    getQuestions(predicate) {
+        return Question.find(predicate).limit(200).exec();
     },
     getRandomQuestion() {
         return new Promise((resolve, reject) => {

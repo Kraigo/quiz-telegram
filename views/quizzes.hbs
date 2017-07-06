@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="card">
+        <div class="card-block">
+            <div class="card-title">Active Quizzes ({{quizzes.length}})</div>
+            <ul class="list-group">
+                {{#each quizzes}}                
+                    <li class="list-group-item">
+                        {{this.question.title}}
+                        <br/>
+                        <small>{{this.question.answer}}</small>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>
