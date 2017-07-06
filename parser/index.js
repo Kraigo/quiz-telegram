@@ -25,12 +25,13 @@ for ( let i = 0; i <= pageSize; i++) {
                 let $content = $('.postContent p b');
                 let questions = [];
 
-                for(let c = 0; c < $content.length; c++) {
+                for(let c = 0; c < $content.length; c+=2) {
                     let question = $content.eq(c).text();
                     let answer = $content.eq(c+1).text();
                     questions.push({
                         title: iconv.decode(question, 'win1251'),
-                        answer: iconv.decode(answer, 'win1251')
+                        answer: iconv.decode(answer, 'win1251'),
+                        isVerified: true
                     })
                 }
 

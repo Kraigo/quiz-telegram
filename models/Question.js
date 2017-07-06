@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 let schema = new mongoose.Schema({
     title: String,
     answer: String,
-    created: { type: Date, default: Date.now }
+    created: { type: Date, default: Date.now },
+    isVerified: Boolean
 });
 
 schema.statics.random = function(callback) {
