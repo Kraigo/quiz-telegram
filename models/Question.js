@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 let schema = new mongoose.Schema({
     title: String,
-    answer: String
+    answer: String,
+    created: { type: Date, default: Date.now }
 });
 
 schema.statics.random = function(callback) {
