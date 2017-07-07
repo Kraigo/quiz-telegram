@@ -9,6 +9,8 @@ const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, options);
 const smart = require('./smart')(bot);
 const memory = require('./memory');
 
+bot.setWebHook(`${process.env.SITE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`);
+
 bot.on("message", msg => {
     let chatId = msg.chat.id;
 

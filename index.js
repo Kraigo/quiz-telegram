@@ -43,8 +43,6 @@ app.post('/addQuestion', function(req, res) {
 
 
 //* Webhook express *//
-bot.bot.setWebHook(`${process.env.SITE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`);
-
 app.post(`/bot${process.env.TELEGRAM_BOT_TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
