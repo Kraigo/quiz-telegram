@@ -48,6 +48,6 @@ app.post(`/bot${process.env.TELEGRAM_BOT_TOKEN}`, (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(port, function () {
+app.listen(port, "0.0.0.0", function () {
   console.log(`Example app listening on port ${port}!`);
 });
