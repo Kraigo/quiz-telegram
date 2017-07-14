@@ -8,7 +8,7 @@ const memory = require('./memory');
 bot.setWebHook(`${process.env.SITE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`);
 
 bot.on("message", msg => {
-    console.log("MESSAGE!!!!")
+    console.log("MESSAGE!!!!", msg)
     let chatId = msg.chat.id;
 
     smart.checkQuiz(msg);
