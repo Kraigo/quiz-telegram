@@ -7,26 +7,23 @@ const memory = require('./memory');
 
 bot.setWebHook(`${process.env.SITE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`);
 
-function listen() {
-    bot.on("message", msg => {
-        let chatId = msg.chat.id;
+bot.on("message", msg => {
+    console.log("MESSAGE!!!!")
+    let chatId = msg.chat.id;
 
-        smart.checkQuiz(msg);
+    smart.checkQuiz(msg);
 
-        if (msg.text.includes('привет')) {
-            smart.greating(msg);
-        } else if (msg.text.includes('/quiz')) {
-            smart.startQuiz(chatId);
-        } else if (msg.text.includes('/hint')) {
-            smart.startHint(chatId);
-        }
-    })
-}
-
+    if (msg.text.includes('привет')) {
+        smart.greating(msg);
+    } else if (msg.text.includes('/quiz')) {
+        smart.startQuiz(chatId);
+    } else if (msg.text.includes('/hint')) {
+        smart.startHint(chatId);
+    }
+})
 
 
 module.exports = {
-    bot,
-    memory,
-    listen
+    instance: bot,
+    memory
 };

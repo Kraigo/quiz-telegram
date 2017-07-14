@@ -46,12 +46,10 @@ app.post('/addQuestion', function(req, res) {
 app.post(`/bot${process.env.TELEGRAM_BOT_TOKEN}`, (req, res) => {
   console.log('Receives webhook:');
   console.info(req.body);
-  bot.bot.processUpdate(req.body);
+  bot.instance.processUpdate(req.body);
   res.sendStatus(200);
 });
 
 app.listen(port, "0.0.0.0", function () {
   console.log(`Example app listening on port ${port}!`);
 });
-
-bot.listen();
