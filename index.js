@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-mongoose.createConnection(process.env.MONGO_DB);
+mongoose.connect(process.env.MONGO_DB);
 mongoose.connection.on('error', console.error);
 
 
