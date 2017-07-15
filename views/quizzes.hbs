@@ -1,18 +1,18 @@
-<div class="container">
-    <div class="card">
-        <div class="card-block">
-            <div class="card-title">Active Quizzes ({{quizzes.length}})</div>
-            <ul class="list-group">
-                {{#each quizzes}}                
-                    <li class="list-group-item flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <div class="mb-1">{{this.question.title}}</div>
-                            <small>chat_id: {{this.chatId}}</small>
-                        </div>
-                        <b>{{this.question.answer}}</b>
-                    </li>
-                {{/each}}
-            </ul>
-        </div>
-    </div>
-</div>
+<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%">
+    <thead>
+        <tr>
+            <th>ChatId</th>
+            <th class="mdl-data-table__cell--non-numeric">Title</th>
+            <th class="mdl-data-table__cell--non-numeric">Answer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each quizzes}}
+            <tr>
+                <td>{{this.chatId}}</td>
+                <td class="mdl-data-table__cell--non-numeric">{{this.question.title}}</td>
+                <td class="mdl-data-table__cell--non-numeric">{{this.question.answer}}</td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

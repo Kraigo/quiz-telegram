@@ -24,13 +24,23 @@ app.get('/', function (req, res) {
   res.render('index');
 });
 app.get('/quizzes', function (req, res) {
-  bot.memory.getQuizzes({isEnded: false}).then(quizzes => {
+  let query = Object.assign({
+    isEnded: false
+  }, req.query);
+
+  bot.memory.getQuizzes(query).then(quizzes => {
     res.render('quizzes', {quizzes});
   })
 });
 app.get('/questions', function (req, res) {
+    let query = Object.assign({}, req.query);
   bot.memory.getQuestions(req.query).then(questions => {
-    res.render('questions', {questions});
+    res.render('questions', {questions, helpers: {
+      dateFormat: input => {
+          let date = new Date(input);
+          return isNaN(date.getTime()) ? date : date.toISOString().slice(0,10)}}
+      }
+      );
   })
 });
 

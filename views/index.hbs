@@ -1,20 +1,29 @@
-<div class="container">
-    <div class="card">
-        <div class="card-block">
-            <h4 class="card-title">Create new question</h4>
-            <form action="/addQuestion" method="POST">
-                <div class="form-group">
-                    <label for="">Question</label>
-                    <textarea type="text" name="question" class="form-control" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="">Answer</label>
-                    <input type="text" name="answer" class="form-control" required />
-                </div>
-                <div class="form-group">
-                    <input class="btn btn-primary" type="submit" value="Add question">
-                </div>
+<form action="/addQuestion" method="POST">
+    <div class="mdl-card mdl-shadow--2dp" style="margin: 0 auto">
+
+        <div class="mdl-card__title">
+            <h4 class="mdl-card__title-text">
+                Create new question
+            </h4>
         </div>
+
+        <div class="mdl-card__supporting-text">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <textarea type="text" name="question" class="mdl-textfield__input"></textarea>
+                <label class="mdl-textfield__label">Question</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input type="text" name="answer" class="mdl-textfield__input" />
+                <label class="mdl-textfield__label" for="">Answer</label>
+            </div>
+        </div>
+
+        <div class="mdl-card__actions">
+            <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                <i class="material-icons">save</i> Add question
+            </button>
+        </div>
+
     </div>
-    </form>
-</div>
+    
+</form>
