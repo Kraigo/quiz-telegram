@@ -27,6 +27,6 @@ bot.on("message", msg => {
 
 
 module.exports = {
-    instance,
+    instance: bot,
     memory
 };
