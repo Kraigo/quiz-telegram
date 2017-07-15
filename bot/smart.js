@@ -30,17 +30,21 @@ module.exports = function(bot) {
         },
         sendQuiz(chatId, quiz) {
             let message = speech.quiz(quiz);
-
+            if (quiz.hintAvailable) {
+                message += '\n'+speech.wanthint();
+            }
             return bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
                 .then(res => {
 
-                    setTimeout(() => {
-                        quiz.hintAvailable = true;
-                        quiz.save().then(() => {
-                            message += `\nДать подсказку /hint ?`;
-                            bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown"});
-                        });
-                    }, 5000);
+                    if (quiz.hintAvailable === false) {
+                        setTimeout(() => {
+                            quiz.hintAvailable = true;
+                            quiz.save().then(() => {
+                                message += '\n'+speech.wanthint();
+                                bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown"});
+                            });
+                        }, 5000);
+                    }
                     
                 });            
         },

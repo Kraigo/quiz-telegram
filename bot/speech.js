@@ -13,5 +13,8 @@ module.exports = {
     },
     nohint() {
         return `Нечего подсказывать.\nНачните новую игру /quiz`;
+    },
+    wanthint() {
+        return 'Дать подсказку? /hint';
     }
 }

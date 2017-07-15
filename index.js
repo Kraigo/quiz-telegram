@@ -29,18 +29,29 @@ app.get('/quizzes', function (req, res) {
   })
 });
 app.get('/questions', function (req, res) {
-  bot.memory.getQuestions().then(questions => {
+  bot.memory.getQuestions(req.query).then(questions => {
     res.render('questions', {questions});
   })
 });
 
 app.post('/addQuestion', function(req, res) {
-  bot.memory.addQuestion(req.body.question, req.body.answer)
+  let question = req.body.question;
+  question.isVerified = false;
+
+  bot.memory.addQuestion(question, req.body.answer)
     .then(function(err) {
       res.send("ok");
     });
 })
 
-app.listen(port, function () {
+
+//* Webhook express *//
+app.post(`/bot${process.env.TELEGRAM_BOT_TOKEN}`, (req, res) => {
+  console.log('Received webhook');
+  bot.instance.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
+app.listen(port, "0.0.0.0", function () {
   console.log(`Example app listening on port ${port}!`);
 });
