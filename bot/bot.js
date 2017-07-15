@@ -1,6 +1,12 @@
 const TelegramBot = require('node-telegram-bot-api');
+const bot;
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {polling: true});
+if (process.env.NODE_ENV === 'production') {
+    bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
+    bot.setWebHook(`${process.env.SITE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`);
+} else {
+    bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {polling: true});
+}
 
 const smart = require('./smart')(bot);
 const memory = require('./memory');
@@ -21,6 +27,6 @@ bot.on("message", msg => {
 
 
 module.exports = {
-    bot,
+    instance,
     memory
 };
