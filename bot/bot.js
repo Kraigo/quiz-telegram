@@ -1,5 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
-const bot;
+var bot;
 
 if (process.env.NODE_ENV === 'production') {
     bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
