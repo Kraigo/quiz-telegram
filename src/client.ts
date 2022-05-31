@@ -9,6 +9,7 @@ import { Management } from './management';
 export class Client {
 
     private memory = new Memory();
+    private builder = new MessageBuilder();
     private management = new Management(this.bot);
 
     constructor(
@@ -80,8 +81,7 @@ export class Client {
     }
 
     async sendQuiz(chatId: number, quiz: QuizEntity) {
-        const builder = new MessageBuilder();
-        const message = builder.quizText(quiz);
+        const message = this.builder.quizText(quiz);
         const res = await this.bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
 
         if (quiz.hintAvailable === false) {
@@ -90,29 +90,13 @@ export class Client {
             await this.memory.updateQuiz(quiz.id, { hintAvailable: true });
             quiz = await this.memory.getQuiz({ id: quiz.id });
             if (quiz) {
-                const message = builder.quizText(quiz);
+                const message = this.builder.quizText(quiz);
 
                 this.bot.editMessageText(message, { chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown" });
             }
         }
     }
 
-    async sendEndQuiz(chatId: number, quiz: QuizEntity) {
-        const builder = new MessageBuilder();
-        const message = builder.quizEnd(quiz);
-        await this.bot.sendMessage(chatId, message, { parse_mode: "Markdown" })
-    }
-
-    async sendWinQuiz(chatId: number, msgId) {
-        const builder = new MessageBuilder();
-        const message = builder.quizWin();
-
-        await this.bot.sendMessage(chatId, message,
-            {
-                parse_mode: "Markdown",
-                reply_to_message_id: msgId
-            });
-    }
 
     async sendEmpty(chatId: number) {
         const builder = new MessageBuilder();
@@ -148,14 +132,15 @@ export class Client {
                     ended: new Date()
                 });
                 quiz = await this.memory.getQuiz({ chatId })
-                await this.sendEndQuiz(chatId, quiz);
+
+                const text = this.builder.quizEnd(quiz);
+                await this.bot.sendMessage(chatId, text, { parse_mode: "Markdown" })
             }
 
         }
 
         if (!quiz) {
-            const builder = new MessageBuilder();
-            this.bot.sendMessage(chatId, builder.nohint());
+            this.bot.sendMessage(chatId, this.builder.nohint());
         }
     }
 
@@ -188,7 +173,7 @@ export class Client {
                 let score = quiz.hint.split('').filter(a => a === '_').length;
 
                 if (quiz.question.answer.length === score) {
-                    score *= 1.5;
+                    score =  Math.round(score * 1.5);
                 }
 
                 const user = await this.findOrCreateUser(message.from);
@@ -199,7 +184,12 @@ export class Client {
                     ended: new Date(),
                     winner: user
                 });
-                await this.sendWinQuiz(chatId, message.message_id);
+
+                const text = this.builder.quizWin(score);
+                await this.bot.sendMessage(chatId, text, {
+                        parse_mode: "Markdown",
+                        reply_to_message_id: message.message_id
+                    });
             }
         }
     }
@@ -208,18 +198,16 @@ export class Client {
         return val
             .trim()
             .toLowerCase()
-            .replace(/ë/g, 'e')
-            .replace(/ё/g, 'e');
+            .replace(/[ëё]/g, 'e');
     }
 
     async addQuestion(message: TelegramBot.Message) {
         const text = message.text.replace(/\/add\s+/, '');
         const data = text.split('\n');
         const chatId = message.chat.id;
-        const builder = new MessageBuilder();
 
         if (data.length < 2) {
-            const text = builder.addQuestionError();
+            const text = this.builder.addQuestionError();
             await this.bot.sendMessage(chatId, text);
             return;
         }
@@ -233,13 +221,13 @@ export class Client {
         const question = await this.memory.questionsRepository.findOneBy({title});
 
         if (question) {
-            const text = builder.addQuestionExist();
+            const text = this.builder.addQuestionExist();
             await this.bot.sendMessage(chatId, text, { reply_to_message_id: message.message_id });
             
         }
         else if (title && answer) {
             const question = await this.memory.addQuestion(title, answer);
-            const text = builder.addQuestionSuccess(answer);
+            const text = this.builder.addQuestionSuccess(answer);
             await this.bot.sendMessage(chatId, text, { reply_to_message_id: message.message_id });
             await this.management.sendQuestionForValidation(question)
         }
@@ -247,8 +235,7 @@ export class Client {
 
     async sendTop(chatId: number) {
         const users = await this.memory.getTopUser(chatId);
-        const builder = new MessageBuilder();
-        const text = builder.topUsers(users);
+        const text = this.builder.topUsers(users);
         await this.bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
     }
 

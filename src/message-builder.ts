@@ -19,8 +19,8 @@ export class MessageBuilder {
         return `Никто не угадал.\nПравильный ответ: *${answer}*\nНачните новую игру /quiz`
     }
 
-    quizWin(): string {
-        return `Это правильный ответ!\nНачните новую игру /quiz`;
+    quizWin(score: number): string {
+        return `Это правильный ответ! *+${score}*\nНачните новую игру /quiz`;
     }
 
     nohint(): string {
