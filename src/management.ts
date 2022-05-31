@@ -136,20 +136,19 @@ export class Management {
     }
 
     async sendStats() {
-        let text = 'Статус:';
-        text += `\nВопросов: *${await this.memory.questionsRepository.count()}*`;
-        text += ` (+${await this.memory.questionsRepository.countBy({isVerified: true})}`;
-        text += ` | -${await this.memory.questionsRepository.countBy({isVerified: false})})`;
-        text += `\nВикторин сыграно: *${await this.memory.quizesRepository.count()}*`;
-
-        text += `\nПользователей:  *${await this.memory.usersRepository.count()}*`
-
         let {sum: score} = await this.memory.usersRepository
             .createQueryBuilder("user")
             .select("SUM(user.score)", "sum")
             .getRawOne();
 
-        text += `\nВсего очков:  *${score}*`
+        const text = this.builder.stats({
+            questionsTotalCount: await this.memory.questionsRepository.count(),
+            verifiedQuestionsCount: await this.memory.questionsRepository.countBy({isVerified: true}),
+            unverifiedQuestionsCount: await this.memory.questionsRepository.countBy({isVerified: false}),
+            quizesTotalCount: await this.memory.quizesRepository.count(),
+            usersTotalCount: await this.memory.usersRepository.count(),
+            score
+        });
 
         await this.bot.sendMessage(this.managerChatId, text, {parse_mode: "Markdown"});
     }

@@ -76,4 +76,24 @@ export class MessageBuilder {
     noRandomQuestion(): string {
         return 'All verified, no more questions';
     }
+
+    stats({
+        questionsTotalCount,
+        verifiedQuestionsCount,
+        unverifiedQuestionsCount,
+        quizesTotalCount,
+        usersTotalCount,
+        score
+    }): string {
+
+        let text = 'Статус:';
+        text += `\nВопросов: *${questionsTotalCount || 0}*`;
+        text += ` (+${verifiedQuestionsCount || 0}`;
+        text += ` | -${unverifiedQuestionsCount || 0})`;
+        text += `\nВикторин сыграно: *${quizesTotalCount || 0}*`;
+        text += `\nПользователей:  *${usersTotalCount || 0}*`;
+        text += `\nВсего очков:  *${score || 0}*`
+
+        return text;
+    }
 }
