@@ -20,7 +20,7 @@ export class Management {
             return;
         }
         const chatId = message.chat.id;
-        const text = message.text;
+        const text = message.text || '';
 
         if (text.startsWith('/verify')) {
             this.sendRandomQuestion();
