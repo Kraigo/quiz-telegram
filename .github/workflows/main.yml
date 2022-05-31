@@ -1,5 +1,9 @@
 name: remote ssh command
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      
 jobs:
 
   build:
@@ -14,7 +18,7 @@ jobs:
         key: ${{ secrets.KEY }}
         port: 22
         script: |
-         cd ~/checkbot
+         cd ~/quiz-telegram
          git pull
          npm install
          npm run build
