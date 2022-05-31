@@ -98,4 +98,37 @@ export class Memory {
 
         return AppDataSource.manager.save(user);
     }
+
+    async getTopUser(chatId: number): Promise<UserEntity[]> {
+        const quizes = await this.quizesRepository.find({
+            where: {
+                chatId,
+                isEnded: true
+            },
+            relations: {
+                winner: true
+            }
+        });
+
+        const group: {[key: string]: UserEntity} = {};
+
+        for (let quiz of quizes) {
+            const userId = quiz.winner.id;
+            if (userId in group) {
+                continue
+            }
+            group[userId] = quiz.winner;
+        }
+
+        const users = Object.values(group).sort((a,b) => a.score - b.score);
+
+        return users.slice(0, 10);
+    }
+
+    async updateUserScope(userId: number, scope: number): Promise<UserEntity> {
+        const user = await this.usersRepository.findOneBy({id: userId});
+        user.score += scope;
+
+        return AppDataSource.manager.save(user);
+    }
 }

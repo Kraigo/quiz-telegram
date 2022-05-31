@@ -39,6 +39,9 @@ export class Client {
         else if (text.startsWith('/add')) {
             this.addQuestion(message);
         }
+        else if (text.startsWith('/top')) {
+            this.sendTop(chatId);
+        }
     }
 
     async greating(message: TelegramBot.Message)  {
@@ -69,32 +72,32 @@ export class Client {
     }
 
     async sendQuiz(chatId: number, quiz: QuizEntity) {
-        const builder = new MessageBuilder(quiz);
-        const message = builder.quizText();
+        const builder = new MessageBuilder();
+        const message = builder.quizText(quiz);
         const res = await this.bot.sendMessage(chatId, message, {parse_mode: "Markdown"});
 
         if (quiz.hintAvailable === false) {
 
             await delay(5000);
             await this.memory.updateQuiz(quiz.id, {hintAvailable: true});
+            quiz = await this.memory.getQuiz({id: quiz.id});
+            if (quiz) {
+                const message = builder.quizText(quiz);
 
-            quiz.hintAvailable = true;
-            const builder = new MessageBuilder(quiz);
-            const message = builder.quizText();
-
-            this.bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown"});
+                this.bot.editMessageText(message, {chat_id: chatId, message_id: res.message_id, parse_mode: "Markdown"});
+            }
         }       
     }
 
     async sendEndQuiz(chatId: number, quiz: QuizEntity) {
-        const builder = new MessageBuilder(quiz);
-        const message = builder.quizEnd();
+        const builder = new MessageBuilder();
+        const message = builder.quizEnd(quiz);
         await this.bot.sendMessage(chatId, message, {parse_mode: "Markdown"})
     }
 
     async sendWinQuiz(chatId: number, msgId) {
-        const builder = new MessageBuilder(null);
-        let message = builder.quizWin();
+        const builder = new MessageBuilder();
+        const message = builder.quizWin();
         
         await this.bot.sendMessage(chatId, message,
             {
@@ -104,8 +107,8 @@ export class Client {
     }
 
     async sendEmpty(chatId: number) {
-        const builder = new MessageBuilder(null);
-        let message = builder.noQuiz();
+        const builder = new MessageBuilder();
+        const message = builder.noQuiz();
         
         await this.bot.sendMessage(chatId, message,
             {
@@ -143,7 +146,7 @@ export class Client {
         }
         
         if (!quiz) {
-            const builder = new MessageBuilder(null);
+            const builder = new MessageBuilder();
             this.bot.sendMessage(chatId, builder.nohint());
         }
     }
@@ -188,7 +191,8 @@ export class Client {
                         languageCode: message.from.language_code
                     })
                 }
-                
+
+                await this.memory.updateUserScope(userId, score);
                 await this.memory.updateQuiz(quiz.id, {
                     isEnded: true,
                     ended: new Date(),
@@ -227,8 +231,15 @@ export class Client {
 
         if (question && answer) {
             await this.memory.addQuestion(question, answer);
-            const text = builder.addQuestionSuccess();
+            const text = builder.addQuestionSuccess(answer);
             await this.bot.sendMessage(chatId, text, {reply_to_message_id: message.message_id});
         }
+    }
+
+    async sendTop(chatId: number) {
+        const users = await this.memory.getTopUser(chatId);
+        const builder = new MessageBuilder();
+        const text = builder.topUsers(users);
+        await this.bot.sendMessage(chatId, text, {parse_mode: 'Markdown'});
     }
 }
