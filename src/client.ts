@@ -230,7 +230,7 @@ export class Client {
 
         // TODO: Validate existing questions;
 
-        const question = this.memory.questionsRepository.findOneBy({title});
+        const question = await this.memory.questionsRepository.findOneBy({title});
 
         if (question) {
             const text = builder.addQuestionExist();
