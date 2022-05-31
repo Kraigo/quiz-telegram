@@ -20,7 +20,7 @@ export class QuestionEntity {
     @Column({default: () => 'CURRENT_TIMESTAMP'})
     created: Date;
 
-    @Column({default: false})
-    isVerified: boolean;
+    @Column({nullable: true})
+    isVerified?: boolean;
 
 }

@@ -17,7 +17,8 @@
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"],
             "env": {
-                "TELEGRAM_BOT_TOKEN": "2117273130:AAF4ZXeNN9UApFne37dmogx36KGWnTjbLME"
+                "TELEGRAM_BOT_TOKEN": "2117273130:AAF4ZXeNN9UApFne37dmogx36KGWnTjbLME",
+                "MANAGER_CHAT_ID": "-752002855"
             }
         },
     ]

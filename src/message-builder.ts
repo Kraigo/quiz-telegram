@@ -1,4 +1,4 @@
-import { QuizEntity, UserEntity } from "./entities";
+import { QuestionEntity, QuizEntity, UserEntity } from "./entities";
 
 export class MessageBuilder {
 
@@ -36,7 +36,11 @@ export class MessageBuilder {
     }
 
     addQuestionSuccess(answer: string): string {
-        return `Хм, ${answer}?\n Как интересно, я это запомню!`;
+        return `Хм, ${answer}?\nКак интересно, я это запомню!`;
+    }
+
+    addQuestionExist(): string {
+        return `Я уже знаю такой вопрос`;
     }
 
     topUsers(users: UserEntity[]): string {
@@ -45,6 +49,14 @@ export class MessageBuilder {
             `${i+1}. ${this.getName(u)} - ${u.score}`)
             .join('\n')
             || 'Top is empty';
+
+        return text;
+    }
+
+    questionText(question: QuestionEntity): string {
+        let text = `Вопрос:`;
+        text += `\n${question.title}`
+        text += `\nОтвет: ${question.answer}`;
 
         return text;
     }
@@ -59,5 +71,9 @@ export class MessageBuilder {
         else {
             String(user.id)
         }
+    }
+
+    noRandomQuestion(): string {
+        return 'All verified, no more questions';
     }
 }

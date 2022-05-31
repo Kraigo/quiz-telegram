@@ -5,18 +5,48 @@ export class Memory {
     questionsRepository = AppDataSource.getRepository(QuestionEntity);
     quizesRepository = AppDataSource.getRepository(QuizEntity);
     usersRepository = AppDataSource.getRepository(UserEntity);
+
+    // QUESTION
+
+    getQuestion(questionId: number): Promise<QuestionEntity> {
+        return this.questionsRepository.findOneBy({id: questionId});
+    }
+
+    getQuestions(predicate: Partial<QuestionEntity>) {
+        return this.questionsRepository.find({
+            where: {
+                ...predicate
+            },
+            take: 200
+        })
+    }
+
+    getRandomQuestion(predicate?: Partial<QuestionEntity>): Promise<QuestionEntity | null> {
+        return this.questionsRepository
+            .createQueryBuilder()
+            .orderBy("RANDOM()")
+            .limit(1)
+            .where(predicate)
+            .getOne()
+    }
     
     async addQuestion(title: string, answer: string): Promise<QuestionEntity> {
         const question = QuestionEntity.from({
             id: null,
             title,
             answer,
-            isVerified: false,
+            isVerified: null,
             created: new Date()
         })
 
         return AppDataSource.manager.save(question)
     }
+
+    async updateQuestion(quizId: number, update: Partial<QuestionEntity>): Promise<void> {
+        await this.questionsRepository.update({id: quizId}, update);
+    }
+
+    // QUIZ
 
     async addQuiz(chatId: number, question: QuestionEntity): Promise<QuizEntity> {
         const hint = question.answer.split('').map(a => '_').join('');
@@ -63,26 +93,7 @@ export class Memory {
         await this.quizesRepository.update({id: quizId}, update);
     }
 
-    getQuestions(predicate: Partial<QuestionEntity>) {
-        return this.questionsRepository.find({
-            where: {
-                ...predicate
-            },
-            take: 200
-        })
-    }
-
-    getRandomQuestion(): Promise<QuestionEntity | null> {
-        return this.questionsRepository
-            .createQueryBuilder()
-            .orderBy("RANDOM()")
-            .limit(1)
-            .getOne()
-    }
-
-    getHint() {
-
-    }
+    // USER
 
     getUser(userId: number): Promise<UserEntity> {
         return this.usersRepository.findOneBy({ id: userId });
