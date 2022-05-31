@@ -26,7 +26,7 @@ export class Client {
 
     public async onMessage(message: TelegramBot.Message) {
         const chatId = message.chat.id;
-        const text = message.text;
+        const text = message.text || '';
 
         this.verifyQuiz(message);
 
