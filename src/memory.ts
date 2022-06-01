@@ -1,4 +1,4 @@
-import { FindOptionsWhere } from "typeorm";
+import { FindOptionsWhere, IsNull, Not } from "typeorm";
 import { AppDataSource } from "./data-source";
 import { QuestionEntity, QuizEntity, UserEntity } from "./entities";
 import { ChatEntity } from "./entities/chat";
@@ -119,6 +119,28 @@ export class Memory {
     }
 
     async getTopUser(chatId: number): Promise<UserEntity[]> {
+
+        var result  = await this.quizesRepository
+            .createQueryBuilder('quiz')
+            .where({
+                chat: { id: chatId},
+                isEnded: true,
+                winner: Not(IsNull())
+            })
+            .leftJoin("quiz.winner", "user")
+            .groupBy('user.id')
+            .take(10)
+            .select('user', '')
+            .getRawMany();
+
+        return result.map(raw => 
+            Object.keys(raw).reduce((user, k) => {
+                const escapedKey = k.replace('user_', '');
+                user[escapedKey] = raw[k];
+                return user;
+            }, new UserEntity())
+        );
+
         const quizes = await this.quizesRepository.find({
             where: {
                 chat: {id: chatId},
@@ -126,7 +148,8 @@ export class Memory {
             },
             relations: {
                 winner: true
-            }
+            },
+            
         });
 
         const group: {[key: string]: UserEntity} = {};
