@@ -1,4 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
+import { dataSourceFile } from "./data-source";
 import { QuestionEntity } from "./entities";
 import { Memory } from "./memory";
 import { MessageBuilder } from "./message-builder";
@@ -27,6 +28,9 @@ export class Management {
         }
         else if (text.startsWith('/stats')) {
             this.sendStats();
+        }
+        else if (text.startsWith('/backup')) {
+            this.sendBackup();
         }
     }
 
@@ -147,9 +151,21 @@ export class Management {
             unverifiedQuestionsCount: await this.memory.questionsRepository.countBy({isVerified: false}),
             quizesTotalCount: await this.memory.quizesRepository.count(),
             usersTotalCount: await this.memory.usersRepository.count(),
+            chatsTotalCount: await this.memory.chatsRepository.count(),
             score
         });
 
         await this.bot.sendMessage(this.managerChatId, text, {parse_mode: "Markdown"});
+    }
+
+    async sendBackup() {
+        const now = new Date();
+        const date = [
+            now.getFullYear(),
+            now.getMonth() + 1,
+            now.getDate()
+        ].join('-');
+        await this.bot.sendMessage(this.managerChatId, `#Backup for ${date}`)
+        await this.bot.sendDocument(this.managerChatId, dataSourceFile);
     }
 }

@@ -1,10 +1,13 @@
+import { FindOptionsWhere } from "typeorm";
 import { AppDataSource } from "./data-source";
 import { QuestionEntity, QuizEntity, UserEntity } from "./entities";
+import { ChatEntity } from "./entities/chat";
 
 export class Memory {
     questionsRepository = AppDataSource.getRepository(QuestionEntity);
     quizesRepository = AppDataSource.getRepository(QuizEntity);
     usersRepository = AppDataSource.getRepository(UserEntity);
+    chatsRepository = AppDataSource.getRepository(ChatEntity);
 
     // QUESTION
 
@@ -51,10 +54,14 @@ export class Memory {
     async addQuiz(chatId: number, question: QuestionEntity): Promise<QuizEntity> {
         const hint = question.answer.split('').map(a => '_').join('');
 
+        let chat = new ChatEntity();
+        chat.id = chatId;
+        chat = await this.chatsRepository.save(chat);
+
         const quiz = QuizEntity.from({
             id: null,
             start: new Date(),
-            chatId,
+            chat,
             question,
             hint,
             hintAvailable: false,
@@ -66,14 +73,15 @@ export class Memory {
         return AppDataSource.manager.save(quiz);
     }
 
-    getQuiz(predicate: Partial<QuizEntity>): Promise<QuizEntity> {
+    getQuiz(predicate: FindOptionsWhere<QuizEntity>): Promise<QuizEntity> {
         return this.quizesRepository.findOne({
             where: {
                 isEnded: false,
                 ...predicate
             },
             relations: {
-                question: true
+                question: true,
+                chat: true
             }
         });
     }
@@ -113,7 +121,7 @@ export class Memory {
     async getTopUser(chatId: number): Promise<UserEntity[]> {
         const quizes = await this.quizesRepository.find({
             where: {
-                chatId,
+                chat: {id: chatId},
                 isEnded: true
             },
             relations: {

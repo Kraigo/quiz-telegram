@@ -65,7 +65,7 @@ export class Client {
     }
 
     async startQuiz(chatId: number) {
-        const quiz = await this.memory.getQuiz({ chatId });
+        const quiz = await this.memory.getQuiz({ chat: {id: chatId } });
 
         if (quiz) {
             await this.sendQuiz(chatId, quiz);
@@ -110,7 +110,7 @@ export class Client {
 
 
     async startHint(chatId: number) {
-        let quiz = await this.memory.getQuiz({ chatId })
+        let quiz = await this.memory.getQuiz({ chat: {id: chatId } });
 
         if (quiz && quiz.hintAvailable) {
             let nextHint = this.getNextHint(quiz);
@@ -121,7 +121,7 @@ export class Client {
                     hintAvailable: false
                 });
 
-                quiz = await this.memory.getQuiz({ chatId })
+                quiz = await this.memory.getQuiz({ chat: {id: chatId } });
                 await this.sendQuiz(chatId, quiz);
 
             } else {
@@ -131,7 +131,7 @@ export class Client {
                     isEnded: true,
                     ended: new Date()
                 });
-                quiz = await this.memory.getQuiz({ chatId })
+                quiz = await this.memory.getQuiz({ chat: {id: chatId } });
 
                 const text = this.builder.quizEnd(quiz);
                 await this.bot.sendMessage(chatId, text, { parse_mode: "Markdown" })
@@ -163,7 +163,7 @@ export class Client {
 
     async verifyQuiz(message: TelegramBot.Message) {
         const chatId = message.chat.id;
-        const quiz = await this.memory.getQuiz({ chatId });
+        const quiz = await this.memory.getQuiz({ chat: {id: chatId } })
         const userId = message.from.id;
 
         if (quiz) {

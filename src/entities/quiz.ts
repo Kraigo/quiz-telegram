@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm"
+import { ChatEntity } from "./chat";
 import { QuestionEntity } from "./question";
 import { UserEntity } from "./user";
 
@@ -12,8 +13,9 @@ export class QuizEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    chatId: number;
+    @ManyToOne(() => ChatEntity, (chat) => chat.quizzes)
+    @JoinColumn()
+    chat: ChatEntity
 
     @Column()
     hint: string;

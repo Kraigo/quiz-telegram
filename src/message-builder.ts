@@ -83,6 +83,7 @@ export class MessageBuilder {
         unverifiedQuestionsCount,
         quizesTotalCount,
         usersTotalCount,
+        chatsTotalCount,
         score
     }): string {
 
@@ -92,6 +93,7 @@ export class MessageBuilder {
         text += ` | -${unverifiedQuestionsCount || 0})`;
         text += `\nВикторин сыграно: *${quizesTotalCount || 0}*`;
         text += `\nПользователей:  *${usersTotalCount || 0}*`;
+        text += `\nЧатов:  *${chatsTotalCount || 0}*`;
         text += `\nВсего очков:  *${score || 0}*`
 
         return text;
